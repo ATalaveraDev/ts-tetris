@@ -7,13 +7,23 @@ export interface Tetromino {
 export class Block {
   shape: Shape;
   color: string;
+  private _row: number;
+  private _col: number;
 
   set row(value: number) {
-    this.row = value;
+    this._row = value;
+  }
+  
+  get row(): number {
+    return this._row;
   }
 
   set col(value: number) {
-    this.row = value;
+    this._col = value;
+  }
+
+  get col(): number {
+    return this._col;
   }
 
   setPosition(row: number, col: number): void {
