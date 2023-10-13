@@ -90,8 +90,6 @@ class Main {
         block.setPosition(row, col);
         this.drawTetromino(block);
         break;
-      case 'up':
-        this.rotateTetromino(block);
         break;
     }
   }
@@ -108,6 +106,7 @@ class Main {
         this.moveTetromino(block, 'right');
         break;
       case 38:
+        this.rotateTetromino(block);
         break;
       case 32:
         break;
@@ -124,6 +123,10 @@ class Main {
       }
       rotatedShape.push(row);
     }
+
+    this.eraseTetromino(block);
+    block.shape = rotatedShape;
+    this.drawTetromino(block);
   }
 }
 
