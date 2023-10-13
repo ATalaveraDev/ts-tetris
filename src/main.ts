@@ -73,23 +73,28 @@ class Main {
 
     switch (direction) {
       case 'left':
-        this.eraseTetromino(block);
-        col -= 1;
-        block.setPosition(row, col);
-        this.drawTetromino(block);
+        if (this.isMovementAllowed(block, 0, -1)) {
+          this.eraseTetromino(block);
+          col -= 1;
+          block.setPosition(row, col);
+          this.drawTetromino(block);
+        }
         break;
       case 'right':
-        this.eraseTetromino(block);
-        col += 1;
-        block.setPosition(row, col);
-        this.drawTetromino(block);
+        if (this.isMovementAllowed(block, 0, 1)) {
+          this.eraseTetromino(block);
+          col += 1;
+          block.setPosition(row, col);
+          this.drawTetromino(block);
+        }
         break;
       case 'down':
-        this.eraseTetromino(block);
-        row++;
-        block.setPosition(row, col);
-        this.drawTetromino(block);
-        break;
+        if (this.isMovementAllowed(block, 1, 0)) {
+          this.eraseTetromino(block);
+          row++;
+          block.setPosition(row, col);
+          this.drawTetromino(block);
+        }
         break;
     }
   }
@@ -113,7 +118,7 @@ class Main {
     }
   }
 
-  rotateTetromino(block: Block) {
+  rotateTetromino(block: Block): void {
     let rotatedShape = [];
 
     for (let r = 0; r < block.shape[0].length; r++) {
@@ -127,6 +132,23 @@ class Main {
     this.eraseTetromino(block);
     block.shape = rotatedShape;
     this.drawTetromino(block);
+  }
+
+  isMovementAllowed(block: Block, rowOffset: number, colOffset: number) {
+    for (let r = 0; r < block.shape.length; r++) {
+      for (let c = 0; c < block.shape[r].length; c++) {
+        if (block.shape[r][c] !== 0) {
+          let row = block.row + r + rowOffset;
+          let col = block.col + c + colOffset;
+
+          if (row >= BOARD_HEIGHT || col < 0 || col >= BOARD_WIDTH || (row >= 0 && this.board[row][col] !== 0)) {
+            return false;
+          }
+        }
+      } 
+    }
+
+    return true;
   }
 }
 
