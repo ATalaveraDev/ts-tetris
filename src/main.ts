@@ -91,6 +91,7 @@ class Main {
         this.drawTetromino(block);
         break;
       case 'up':
+        this.rotateTetromino(block);
         break;
     }
   }
@@ -110,6 +111,18 @@ class Main {
         break;
       case 32:
         break;
+    }
+  }
+
+  rotateTetromino(block: Block) {
+    let rotatedShape = [];
+
+    for (let r = 0; r < block.shape[0].length; r++) {
+      let row = [];
+      for (let c = block.shape.length - 1; c >= 0; c--) {
+        row.push(block.shape[c][r]);
+      }
+      rotatedShape.push(row);
     }
   }
 }
