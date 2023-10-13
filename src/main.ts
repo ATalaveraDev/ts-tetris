@@ -1,4 +1,4 @@
-import { Block, IBlock, JBlock, LBlock, OBlock, RBlock, SBlock, TBlock } from './models/tetromino.js';
+import { Block, Direction, IBlock, JBlock, LBlock, OBlock, RBlock, SBlock, TBlock } from './models/tetromino.js';
 
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
@@ -68,7 +68,7 @@ class Main {
     }
   }
 
-  moveTetromino(block: Block, direction: string): void {
+  moveTetromino(block: Block, direction: Direction): void {
     let { row, col } = block;
 
     switch (direction) {
@@ -90,6 +90,26 @@ class Main {
         block.setPosition(row, col);
         this.drawTetromino(block);
         break;
+      case 'up':
+        break;
+    }
+  }
+
+  handleKeyPress(block: Block, event: any): void {
+    switch (event.keyCode) {
+      case 37:
+        this.moveTetromino(block, 'left');
+        break;
+      case 40:
+        this.moveTetromino(block, 'down');
+        break;
+      case 39:
+        this.moveTetromino(block, 'right');
+        break;
+      case 38:
+        break;
+      case 32:
+        break;
     }
   }
 }
@@ -98,4 +118,5 @@ const tetris = new Main();
 tetris.setEmptyBoard();
 const block = tetris.getRandomTetromino();
 tetris.drawTetromino(block);
+document.addEventListener('keydown', (event) => tetris.handleKeyPress(block, event));
 setInterval(() => tetris.moveTetromino(block, 'down'), 500);

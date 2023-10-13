@@ -1,3 +1,4 @@
+export type Direction = 'up' | 'down' | 'left' | 'right';
 type Shape = number[][];
 export interface Tetromino {
   shape: Shape;
