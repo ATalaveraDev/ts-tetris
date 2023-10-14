@@ -1,4 +1,4 @@
-import { Block, Direction, IBlock, JBlock, LBlock, OBlock, RBlock, SBlock, TBlock } from './models/tetromino.js';
+import { Block, Direction, IBlock, JBlock, LBlock, OBlock, RBlock, SBlock, TBlock, Shape } from './models/tetromino.js';
 
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
@@ -95,6 +95,8 @@ class Main {
           row++;
           this.currentTetromino.setPosition(row, col);
           this.drawTetromino();
+        } else {
+          this.lockTetromino();
         }
         break;
     }
@@ -130,9 +132,11 @@ class Main {
       rotatedShape.push(row);
     }
 
-    this.eraseTetromino();
-    this.currentTetromino.shape = rotatedShape;
-    this.drawTetromino();
+    if (this.isRotationAllowed(rotatedShape)) {
+      this.eraseTetromino();
+      this.currentTetromino.shape = rotatedShape;
+      this.drawTetromino();
+    }
   }
 
   isMovementAllowed(rowOffset: number, colOffset: number): boolean {
@@ -150,6 +154,37 @@ class Main {
     }
 
     return true;
+  }
+
+  isRotationAllowed(shape: Shape): boolean {
+    for (let r = 0; r < shape.length; r++) {
+      for (let c = 0; c < shape[r].length; c++) {
+        if (shape[r][c] !== 0) {
+          let row = this.currentTetromino.row + r;
+          let col = this.currentTetromino.col + c;
+
+          if (row >= BOARD_HEIGHT || col < 0 || col >= BOARD_WIDTH || (row >= 0 && this.board[row][col] !== 0)) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
+  lockTetromino(): void {
+    for (let r = 0; r < this.currentTetromino.shape.length; r++) {
+      for (let c = 0; c < this.currentTetromino.shape[r].length; c++) {
+        if (this.currentTetromino.shape[r][c] !== 0) {
+          let row = this.currentTetromino.row + r;
+          let col = this.currentTetromino.col + c;
+          this.board[row][col] = this.currentTetromino.shape[r][c];
+        }
+      }
+    }
+
+    this.getRandomTetromino();
   }
 }
 
