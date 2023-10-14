@@ -1,5 +1,5 @@
 export type Direction = 'down' | 'left' | 'right';
-type Shape = number[][];
+export type Shape = number[][];
 export interface Tetromino {
   shape: Shape;
   color: string;

@@ -8,3 +8,5 @@ Like everything in life this is not perfect, especially when you type without th
 [x] Remove block dependency
 
 [] Extract board logic
+
+[] Loops, loops, loops, .....
