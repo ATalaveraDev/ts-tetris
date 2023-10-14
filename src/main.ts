@@ -6,6 +6,7 @@ const BOARD_HEIGHT = 20;
 class Main {
   board: number[][];
   tetrominoes: Block[];
+  currentTetromino: Block;
 
   constructor() {
     this.board = [];
@@ -29,36 +30,36 @@ class Main {
     }
   }
 
-  getRandomTetromino(): Block {
+  getRandomTetromino(): void {
     const index = Math.floor(Math.random() * this.tetrominoes.length);
     const tetromino = this.tetrominoes[index]
     tetromino.setPosition(0, Math.floor(Math.random() * (BOARD_WIDTH - tetromino.shape[0].length + 1)));
 
-    return tetromino;
+    this.currentTetromino = tetromino;
   }
 
   // value 24px comes from the css for block
-  drawTetromino(tetromino: Block): void {
-    for (let r = 0; r < tetromino.shape.length; r++) {
-      for (let c = 0; c < tetromino.shape[r].length; c++) {
-        if (tetromino.shape[r][c]) {
+  drawTetromino(): void {
+    for (let r = 0; r < this.currentTetromino.shape.length; r++) {
+      for (let c = 0; c < this.currentTetromino.shape[r].length; c++) {
+        if (this.currentTetromino.shape[r][c]) {
           const element = document.createElement('div');
           element.classList.add('block');
-          element.style.backgroundColor = tetromino.color;
-          element.style.top = `${((tetromino.row + r) * 24)}px`;
-          element.style.left = `${((tetromino.col + c) * 24)}px`;
-          element.setAttribute('id', `block-${tetromino.row + r}-${tetromino.col + c}`);
+          element.style.backgroundColor = this.currentTetromino.color;
+          element.style.top = `${((this.currentTetromino.row + r) * 24)}px`;
+          element.style.left = `${((this.currentTetromino.col + c) * 24)}px`;
+          element.setAttribute('id', `block-${this.currentTetromino.row + r}-${this.currentTetromino.col + c}`);
           document.getElementById('game-board').appendChild(element);
         }
       }
     }
   }
 
-  eraseTetromino(tetromino: Block): void {
-    for (let r = 0; r < tetromino.shape.length; r++) {
-      for (let c = 0; c < tetromino.shape[r].length; c++) {
-        if (tetromino.shape[r][c] !== 0) {
-          const block = document.getElementById(`block-${tetromino.row + r}-${tetromino.col + c}`)
+  eraseTetromino(): void {
+    for (let r = 0; r < this.currentTetromino.shape.length; r++) {
+      for (let c = 0; c < this.currentTetromino.shape[r].length; c++) {
+        if (this.currentTetromino.shape[r][c] !== 0) {
+          const block = document.getElementById(`block-${this.currentTetromino.row + r}-${this.currentTetromino.col + c}`)
 
           if (block) {
             document.getElementById('game-board').removeChild(block);
@@ -68,78 +69,78 @@ class Main {
     }
   }
 
-  moveTetromino(block: Block, direction: Direction): void {
-    let { row, col } = block;
+  moveTetromino(direction: Direction): void {
+    let { row, col } = this.currentTetromino;
 
     switch (direction) {
       case 'left':
-        if (this.isMovementAllowed(block, 0, -1)) {
-          this.eraseTetromino(block);
+        if (this.isMovementAllowed(0, -1)) {
+          this.eraseTetromino();
           col -= 1;
-          block.setPosition(row, col);
-          this.drawTetromino(block);
+          this.currentTetromino.setPosition(row, col);
+          this.drawTetromino();
         }
         break;
       case 'right':
-        if (this.isMovementAllowed(block, 0, 1)) {
-          this.eraseTetromino(block);
+        if (this.isMovementAllowed(0, 1)) {
+          this.eraseTetromino();
           col += 1;
-          block.setPosition(row, col);
-          this.drawTetromino(block);
+          this.currentTetromino.setPosition(row, col);
+          this.drawTetromino();
         }
         break;
       case 'down':
-        if (this.isMovementAllowed(block, 1, 0)) {
-          this.eraseTetromino(block);
+        if (this.isMovementAllowed(1, 0)) {
+          this.eraseTetromino();
           row++;
-          block.setPosition(row, col);
-          this.drawTetromino(block);
+          this.currentTetromino.setPosition(row, col);
+          this.drawTetromino();
         }
         break;
     }
   }
 
-  handleKeyPress(block: Block, event: any): void {
+  handleKeyPress(event: any): void {
     switch (event.keyCode) {
       case 37:
-        this.moveTetromino(block, 'left');
+        this.moveTetromino('left');
         break;
       case 40:
-        this.moveTetromino(block, 'down');
+        this.moveTetromino('down');
         break;
       case 39:
-        this.moveTetromino(block, 'right');
+        this.moveTetromino('right');
         break;
       case 38:
-        this.rotateTetromino(block);
+        this.rotateTetromino();
         break;
       case 32:
         break;
     }
   }
 
-  rotateTetromino(block: Block): void {
+  rotateTetromino(): void {
     let rotatedShape = [];
 
-    for (let r = 0; r < block.shape[0].length; r++) {
+    for (let r = 0; r < this.currentTetromino.shape[0].length; r++) {
       let row = [];
-      for (let c = block.shape.length - 1; c >= 0; c--) {
-        row.push(block.shape[c][r]);
+      for (let c = this.currentTetromino.shape.length - 1; c >= 0; c--) {
+        row.push(this.currentTetromino.shape[c][r]);
       }
       rotatedShape.push(row);
     }
 
-    this.eraseTetromino(block);
-    block.shape = rotatedShape;
-    this.drawTetromino(block);
+    this.eraseTetromino();
+    this.currentTetromino.shape = rotatedShape;
+    this.drawTetromino();
   }
 
-  isMovementAllowed(block: Block, rowOffset: number, colOffset: number) {
-    for (let r = 0; r < block.shape.length; r++) {
-      for (let c = 0; c < block.shape[r].length; c++) {
-        if (block.shape[r][c] !== 0) {
-          let row = block.row + r + rowOffset;
-          let col = block.col + c + colOffset;
+  isMovementAllowed(rowOffset: number, colOffset: number): boolean {
+    for (let r = 0; r < this.currentTetromino.shape.length; r++) {
+      for (let c = 0; c < this.currentTetromino.shape[r].length; c++) {
+        if (this.currentTetromino.shape[r][c] !== 0) {
+          let row = this.currentTetromino.row + r + rowOffset;
+          let col = this.currentTetromino.col + c + colOffset;
 
           if (row >= BOARD_HEIGHT || col < 0 || col >= BOARD_WIDTH || (row >= 0 && this.board[row][col] !== 0)) {
             return false;
@@ -154,7 +155,7 @@ class Main {
 
 const tetris = new Main();
 tetris.setEmptyBoard();
-const block = tetris.getRandomTetromino();
-tetris.drawTetromino(block);
-document.addEventListener('keydown', (event) => tetris.handleKeyPress(block, event));
-setInterval(() => tetris.moveTetromino(block, 'down'), 500);
+tetris.getRandomTetromino();
+tetris.drawTetromino();
+document.addEventListener('keydown', (event) => tetris.handleKeyPress(event));
+setInterval(() => tetris.moveTetromino('down'), 500);
