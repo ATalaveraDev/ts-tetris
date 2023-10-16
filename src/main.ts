@@ -4,7 +4,7 @@ const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
 
 class Main {
-  board: number[][];
+  board: (number | string)[][];
   tetrominoes: Block[];
   currentTetromino: Block;
 
@@ -179,12 +179,61 @@ class Main {
         if (this.currentTetromino.shape[r][c] !== 0) {
           let row = this.currentTetromino.row + r;
           let col = this.currentTetromino.col + c;
-          this.board[row][col] = this.currentTetromino.shape[r][c];
+          this.board[row][col] = this.currentTetromino.color;
         }
       }
     }
 
+    this.clearLine();
+
     this.getRandomTetromino();
+  }
+
+  clearLine(): void {
+    let rowsToClean = 0;
+
+    for (let r = BOARD_HEIGHT - 1; r >= 0; r--) {
+      let rowFullFilled = true;
+
+      for (let c = 0; c < BOARD_WIDTH; c++) {
+        if (this.board[r][c] === 0) {
+          rowFullFilled = false;
+          break;
+        }
+      }
+
+      if (rowFullFilled) {
+        rowsToClean++;
+
+        for (let rowToClean = r; rowToClean > 0; rowToClean--) {
+          for (let c = 0; c < BOARD_WIDTH; c++) {
+            this.board[rowToClean][c] = this.board[rowToClean-1][c];
+          }
+        }
+
+        // set new empty line at the beginning
+        for (let x = 0; x < BOARD_WIDTH; x++) {
+          this.board[0][x] = 0;
+        }
+
+        document.getElementById('game-board').innerHTML = '';
+
+        for (let row = 0; row < BOARD_HEIGHT; row++) {
+          for(let col = 0; col < BOARD_WIDTH; col++) {
+            if (this.board[row][col]) {
+              const element = document.createElement('div');
+              element.classList.add('block');
+              element.style.backgroundColor = this.board[row][col] as string;
+              element.style.top = `${row * 24}px`;
+              element.style.left = `${col * 24}px`;
+              element.setAttribute('id', `block-${row}-${col}`);
+              document.getElementById('game-board').appendChild(element);
+            }
+          }
+        }
+      }
+    }
+
   }
 }
 
